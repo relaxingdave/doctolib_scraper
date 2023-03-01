@@ -11,35 +11,50 @@ import logging
 import requests
 
 from config import latest_date, url, loop_time
+from telegram import send_availability_message
 
-logging.basicConfig(filename="log_history.log", level=logging.INFO)
+# for logging extract practice id
+pos_1 = url.find('practice_ids=')
+pos_2 = url[pos_1:].find('&') + pos_1
+practice_id_string = url[pos_1:pos_2]
+
+logging.basicConfig(
+    filename=f"log_history_{practice_id_string}.log",
+    level=logging.INFO
+)
 logger = logging.getLogger()
 
-TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
-TELEGRAM_RECEIVER_ID = os.environ['TELEGRAM_RECEIVER_ID']
 
-message_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+def get_next_practice_appointment(url):
+    """
+    Returns the next available slot for an appointment at a provided doctolib
+    doctor.
+    """
+    output_dict = (
+        requests
+        .get(url,headers={'User-Agent': 'Mozilla/5.0'})
+        .json()
+    )
+    next_free_date = output_dict['next_slot'][:10]
+    next_free_date = datetime.strptime(next_free_date, '%Y-%m-%d').date()
+    
+    return next_free_date
+
 
 def main():
 
+    # max date as datetime.date
     max_date = datetime.strptime(latest_date, '%Y-%m-%d').date()
 
     while True:
-        output_dict = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).json()
-        next_free_date = output_dict['next_slot'][:10]
-        next_free_date = datetime.strptime(next_free_date, '%Y-%m-%d').date()
+        next_free_date = get_next_practice_appointment(url)
         # log results in file
         logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')}: {next_free_date}")
 
-        if next_free_date < max_date:
+        if next_free_date <= max_date:
             os.system("Say An appointment is available.")
-            params = {
-                "chat_id": TELEGRAM_RECEIVER_ID,
-                "text":f"An appointment is available on {next_free_date}."
-            }
-            message = requests.post(message_url, params=params)
-            if not message.status_code == 200:
-                raise RuntimeError("Telegram message could not be sent.")
+            send_availability_message(next_free_date)
+            logger.info(f"Date is earlier than {max_date}. Message has been sent out")
             break
 
         time.sleep(loop_time * 60)
