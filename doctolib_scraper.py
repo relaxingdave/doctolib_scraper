@@ -11,6 +11,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger()
 
+
 def main():
 
     telegram = telegram_bot()
@@ -42,7 +43,7 @@ def main():
                     )
                     telegram.delete_job(j)
 
-        logger.info(f"Waiting for 60 seconds to update jobs and available appointments...")
+        logger.info("Waiting for 60 seconds to update jobs and available appointments...")
         time.sleep(loop_time * 60)
 
 

@@ -18,6 +18,7 @@ TELEGRAM_RECEIVER_ID = os.environ['TELEGRAM_RECEIVER_ID']
 # url for doctor appointment, latest appointment
 # the latest appointment is also when the job expires or when there is an appointment found
 
+
 class telegram_bot():
 
     def __init__(self):
@@ -42,7 +43,7 @@ class telegram_bot():
             text, url, end_date, sender_id, update_id = self._parse_request_info(c)
             # if the request already is in the dict, skip to next request
             if update_id in self.processed_update_ids:
-                logger.info(f"job {update_id} was already processed and is skipped.")
+                logger.info(f"job {update_id} has already been processed and is skipped.")
                 continue
             self.processed_update_ids.add(update_id)
             # if the request is not in the right format, skip to next request
@@ -60,7 +61,6 @@ class telegram_bot():
 
         return self
 
-
     def send_availability_message(self, url, receiver_id, next_free_date, end_date):
         """
         Sends a message to the provided Telegram chat id about
@@ -77,7 +77,6 @@ class telegram_bot():
         if not message.status_code == 200:
             raise RuntimeError("Telegram message could not be sent.")
 
-
     def filter_out_inactive_jobs(self):
         for k, v in list(self.jobs_dict.items()):
             if v[2] < datetime.today().date():
@@ -87,12 +86,10 @@ class telegram_bot():
                     end_date=v[2].strftime('%Y-%m-%d'),
                 )
                 del self.jobs_dict[k]
-
     
     def delete_job(self, job):
         del self.jobs_dict[job]
         self._send_deleted_job_message
-
 
     def _send_deleted_job_message(self, url, receiver_id, end_date):
         """
@@ -109,7 +106,6 @@ class telegram_bot():
         message = requests.post(message_url, params=params)
         if not message.status_code == 200:
             raise RuntimeError("Telegram message could not be sent.")
-
 
     def _send_request_status_message(self, telegram_receiver_id, message, successful):
         """
@@ -139,7 +135,6 @@ class telegram_bot():
         message = requests.post(message_url, params=params)
         if not message.status_code == 200:
             raise RuntimeError("Telegram message could not be sent.")
-
 
     def _parse_request_info(self, message_object):
         """
