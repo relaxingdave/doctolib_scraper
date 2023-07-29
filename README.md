@@ -1,7 +1,6 @@
 # doctolib_scraper
 
-The script queries a doctolib practice for the next available appointment and sends a telegram message
-if an appointment is free before a defined date.
+The script queries a doctolib practice for the next available appointment and sends a telegram message if an appointment is free before a defined date.
 
 - Run from terminal `pip install -r requirements.txt`
 - Create a Telegram bot (write a message to Botfather, define a name, send at least 1 message to the bot)

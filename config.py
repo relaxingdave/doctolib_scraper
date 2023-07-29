@@ -1,7 +1,7 @@
 from datetime import date
 
 # enter latest date (inclusive) to check appointments for as string
-latest_date = '2023-05-30'
+latest_date = '2023-08-30'
 # enter earliest date to check appointments for as a string
 min_date = str(date.today())
 
