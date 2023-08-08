@@ -66,7 +66,7 @@ def get_next_practice_appointment(url, end_date):
         search_date_url = (
             url[:sd_index] + search_date.strftime('%Y-%m-%d') + url[sd_index + 10:]
         )
-        output_dict = get_dict_from_url(search_date_url)
+        output_dict = get_dict_from_url(search_date_url, proxy=True)
         # loop over all 15 dates and check if it is available
         for d in output_dict['availabilities']:
             if len(d['slots']) > 0:

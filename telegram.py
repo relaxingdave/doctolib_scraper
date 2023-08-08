@@ -34,6 +34,7 @@ class telegram_bot():
         # option to get chat updates of the bot
         telegram_chats = get_dict_from_url(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates",
+            proxy=False
         )
         new_messages = len(telegram_chats['result'])
         logger.info(f"{new_messages} new messages received in the last 24 hours.")
@@ -141,11 +142,15 @@ class telegram_bot():
         Extracts doctolib search request info from message object
         """
 
-        text = message_object['message']['text']
+        try:
+            message = message_object['message']
+        except:
+            message = message_object['edited_message']
+        text = message['text']
         url = text.split(',')[0].replace(" ", "")
         # we will scrape for 15 days
         url = url.replace('limit=5', 'limit=15')
-        sender_id = message_object['message']['from']['id']
+        sender_id = message['from']['id']
         update_id = message_object['update_id']
 
         # in case date is not in the right format;
